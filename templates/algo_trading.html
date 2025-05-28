@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Algorithmic Trading - {{ super() }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-center mb-4">Algorithmic Trading</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Add New Algorithm</h5>
+            
+            {% if not watchlist %}
+                <div class="alert alert-warning">
+                    You need to add stocks to your watchlist first before creating algorithms.
+                    <a href="{{ url_for('index') }}" class="alert-link">Go to Watchlist</a>
+                </div>
+            {% endif %}
+            
+            <form method="POST" action="{{ url_for('add_algo') }}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <select class="form-select mb-3" name="stock_id" required {% if not watchlist %}disabled{% endif %}>
+                            <option value="" selected disabled>Select Stock</option>
+                            {% if watchlist %}
+                                {% for item in watchlist %}
+                                    <option value="{{ item.stock.id }}">{{ item.stock.symbol }} - {{ item.stock.name }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option disabled>No stocks in watchlist</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <input type="number" class="form-control" name="threshold" min="0.1" step="0.1" value="1.0" required {% if not watchlist %}disabled{% endif %}>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100" {% if not watchlist %}disabled{% endif %}>Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Your Algorithms</h5>
+            
+            {% if algorithms %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Stock</th>
+                                <th>Current Price</th>
+                                <th>Threshold</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for algo in algorithms %}
+                                <tr>
+                                    <td>{{ algo.stock.symbol }}</td>
+                                    <td>${{ "%.2f"|format(algo.stock.price) }}</td>
+                                    <td>{{ "%.1f"|format(algo.threshold) }}%</td>
+                                    <td>
+                                        <span class="badge bg-{% if algo.active %}success{% else %}danger{% endif %}">
+                                            {% if algo.active %}Active{% else %}Inactive{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('toggle_algo', algo_id=algo.id) }}" 
+                                           class="btn btn-sm btn-{% if algo.active %}danger{% else %}success{% endif %}">
+                                            {% if algo.active %}Deactivate{% else %}Activate{% endif %}
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No algorithms configured yet. Add one above.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">How It Works</h5>
+            <p>The algorithm checks price movements every 5 minutes:</p>
+            <ul>
+                <li>Monitors high-low difference in 5-minute candles</li>
+                <li>Executes BUY when movement exceeds your threshold</li>
+                <li>Buys 1 share when triggered (virtual execution)</li>
+                <li>Runs continuously while active</li>
+            </ul>
+            <p class="text-muted small">Note: This is a simulation using real price data but virtual trades.</p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}User Guide - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Stock Simulator User Guide</h1>
+    
+    <div class="accordion" id="guideAccordion">
+        <!-- Section 1 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#guide1">
+                    Getting Started
+                </button>
+            </h2>
+            <div id="guide1" class="accordion-collapse collapse show" data-bs-parent="#guideAccordion">
+                <div class="accordion-body">
+                    <ol>
+                        <li>Add stocks to your watchlist using the search function</li>
+                        <li>Monitor real-time prices (updated every 30 minutes)</li>
+                        <li>Use the Buy/Sell buttons to execute trades</li>
+                        <li>Track your portfolio performance</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 2 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#guide2">
+                    Algorithmic Trading
+                </button>
+            </h2>
+            <div id="guide2" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+                <div class="accordion-body">
+                    <p>Our algorithmic trading feature allows you to:</p>
+                    <ul>
+                        <li>Set up automatic buy triggers based on price movements</li>
+                        <li>Configure percentage thresholds (1% default)</li>
+                        <li>Monitor active algorithms on your dashboard</li>
+                        <li>Enable/disable algorithms as needed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add more sections as needed -->
+    </div>
+</div>
+{% endblock %}

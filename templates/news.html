@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Market News - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Latest Market News</h1>
+    
+    {% if news %}
+        <div class="row">
+            {% for article in news %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    {% if article.urlToImage %}
+                    <img src="{{ article.urlToImage }}" class="card-img-top" alt="{{ article.title }}" style="max-height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        <p class="card-text text-muted">
+                            <small>
+                                {% if article.source and article.source.name %}
+                                    {{ article.source.name }} • 
+                                {% endif %}
+                                {% if article.publishedAt %}
+                                    {{ article.publishedAt|datetimeformat }}
+                                {% else %}
+                                    Unknown date
+                                {% endif %}
+                            </small>
+                        </p>
+                        <p class="card-text">{{ article.description or 'No description available' }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ article.url }}" target="_blank" class="btn btn-primary btn-sm">Read Full Story</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">No news available at the moment. Please try again later.</div>
+    {% endif %}
+</div>
+{% endblock %}

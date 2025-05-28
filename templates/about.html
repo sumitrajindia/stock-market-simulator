@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ super() }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-center mb-4">About This Application</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Stock Market Simulator</h5>
+            <p class="card-text">
+                This is a stock market simulation application built with Python and Flask. 
+                Key features include real-time stock data integration, portfolio tracking, 
+                and watchlist management.
+            </p>
+            <h5>Features:</h5>
+            <ul>
+                <li>Real-time stock price updates (30-minute intervals)</li>
+                <li>Portfolio tracking with P/L calculations</li>
+                <li>Buy/Sell functionality</li>
+                <li>Watchlist management</li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio Analytics - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Portfolio Analytics</h1>
+    
+    <div class="row">
+        <!-- Performance Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Performance Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total Value</h6>
+                                    <h4>${{ "%.2f"|format(total_value) }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total Profit/Loss</h6>
+                                    <h4 class="{% if total_pl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        ${{ "%.2f"|format(total_pl) }} ({{ "%.2f"|format(pl_percentage) }}%)
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asset Allocation -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Asset Allocation</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="allocationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Chart -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Historical Performance</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Detailed Holdings -->
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Detailed Holdings</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Stock</th>
+                            <th>Shares</th>
+                            <th>Avg Price</th>
+                            <th>Current Price</th>
+                            <th>Value</th>
+                            <th>P/L</th>
+                            <th>% of Portfolio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in portfolio %}
+                        <tr>
+                            <td>{{ item.stock.symbol }}</td>
+                            <td>{{ "%.2f"|format(item.quantity) }}</td>
+                            <td>${{ "%.2f"|format(item.average_price) }}</td>
+                            <td>${{ "%.2f"|format(item.stock.price) }}</td>
+                            <td>${{ "%.2f"|format(item.stock.price * item.quantity) }}</td>
+                            <td class="{% if (item.stock.price - item.average_price) >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                ${{ "%.2f"|format((item.stock.price - item.average_price) * item.quantity) }}
+                                ({{ "%.2f"|format(((item.stock.price - item.average_price)/item.average_price)*100) }}%)
+                            </td>
+                            <td>{{ "%.1f"|format((item.stock.price * item.quantity / total_value) * 100) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Asset Allocation Chart
+    const allocationCtx = document.getElementById('allocationChart').getContext('2d');
+    new Chart(allocationCtx, {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for item in portfolio %}
+                    '{{ item.stock.symbol }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for item in portfolio %}
+                        {{ (item.stock.price * item.quantity / total_value) * 100 }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', 
+                    '#e74a3b', '#858796', '#5a5c69', '#2e59d9'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw.toFixed(1)}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Performance Chart (sample data - replace with actual historical data)
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Portfolio Value',
+                data: [10000, 10500, 11000, 11500, 12000, 12500],
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
